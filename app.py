@@ -1,11 +1,11 @@
 import streamlit as st
 import requests
-import json
+import base64
 
 st.set_page_config(page_title="TikTok Affiliate AI Control Panel", layout="centered", page_icon="🚀")
 
 st.title("🚀 TikTok Affiliate AI Control Panel")
-st.write("Input detail produk untuk memicu generasi video otomatis via n8n AI Engine.")
+st.write("Input detail produk & upload foto langsung dari galeri HP untuk memicu generasi video otomatis via n8n AI Engine.")
 
 # URL Webhook dari n8n Anda (Ganti dengan URL N8N Webhook milik Anda)
 N8N_WEBHOOK_URL = "https://n8n-affiliate.onrender.com/webhook/generate-tiktok-video"
@@ -15,27 +15,43 @@ with st.form("product_form"):
     category = st.selectbox("Kategori", ["Fashion", "Electronics", "Beauty", "Home & Living", "Automotive"])
     selling_points = st.text_area("Keunggulan Produk", placeholder="Bahan katun combed 24s, adem, tidak mudah luntur...")
     price = st.text_input("Harga", placeholder="Rp 89.000")
-    image_url = st.text_input("URL Foto Produk (Direct Image Link)", placeholder="https://domain.com/foto-produk.jpg")
+    
+    # Fitur Upload Foto Langsung dari Galeri HP
+    uploaded_file = st.file_uploader("Upload Foto Produk (Galeri HP)", type=["jpg", "jpeg", "png", "webp"])
+    image_url_input = st.text_input("ATAU Link URL Foto (Opsional)", placeholder="https://domain.com/foto-produk.jpg")
+    
     affiliate_link = st.text_input("Link Keranjang Kuning / Affiliate", placeholder="https://vt.tiktok.com/xxxx/")
     
     submit_button = st.form_submit_button("🎬 Buat Video Autopilot")
 
 if submit_button:
-    if not product_name or not image_url:
-        st.error("Mohon isi minimal Nama Produk dan URL Foto Produk!")
+    if not product_name:
+        st.error("Mohon isi Nama Produk!")
+    elif not uploaded_file and not image_url_input:
+        st.error("Mohon upload foto dari galeri ATAU isi Link URL Foto!")
     else:
+        image_base64 = ""
+        image_filename = ""
+        
+        if uploaded_file is not None:
+            bytes_data = uploaded_file.getvalue()
+            image_base64 = base64.b64encode(bytes_data).decode("utf-8")
+            image_filename = uploaded_file.name
+            
         payload = {
             "Product Name": product_name,
             "Category": category,
             "Selling Points": selling_points,
             "Price": price,
-            "Image URL": image_url,
+            "Image URL": image_url_input if image_url_input else "",
+            "Image Base64": image_base64,
+            "Image Filename": image_filename,
             "Affiliate Link": affiliate_link
         }
         
-        with st.spinner("Mengirim perintah ke n8n AI Engine..."):
+        with st.spinner("Mengirim perintah & foto ke n8n AI Engine..."):
             try:
-                response = requests.post(N8N_WEBHOOK_URL, json=payload, timeout=10)
+                response = requests.post(N8N_WEBHOOK_URL, json=payload, timeout=30)
                 if response.status_code == 200:
                     st.success("✅ Perintah berhasil dikirim! AI sedang memproses naskah, voiceover, dan render video.")
                     st.info("Cek aplikasi Telegram di HP Anda untuk pratinjau hasil video.")
@@ -43,4 +59,3 @@ if submit_button:
                     st.error(f"Gagal menghubungkan ke n8n. Status Code: {response.status_code}")
             except Exception as e:
                 st.error(f"Terjadi kesalahan koneksi: {str(e)}")
-              
