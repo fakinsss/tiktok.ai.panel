@@ -7,7 +7,7 @@ st.set_page_config(page_title="TikTok Affiliate AI Control Panel", layout="cente
 st.title("🚀 TikTok Affiliate AI Control Panel")
 st.write("Input detail produk & upload foto langsung dari galeri HP untuk memicu generasi video otomatis via n8n AI Engine.")
 
-# URL Webhook dari n8n Anda (Ganti dengan URL N8N Webhook milik Anda)
+# URL Webhook dari n8n Anda
 N8N_WEBHOOK_URL = "https://n8n-affiliate.onrender.com/webhook/generate-tiktok-video"
 
 with st.form("product_form"):
@@ -16,9 +16,8 @@ with st.form("product_form"):
     selling_points = st.text_area("Keunggulan Produk", placeholder="Bahan katun combed 24s, adem, tidak mudah luntur...")
     price = st.text_input("Harga", placeholder="Rp 89.000")
     
-    # Fitur Upload Foto Langsung dari Galeri HP
+    # Upload Foto Langsung dari Galeri HP
     uploaded_file = st.file_uploader("Upload Foto Produk (Galeri HP)", type=["jpg", "jpeg", "png", "webp"])
-    image_url_input = st.text_input("ATAU Link URL Foto (Opsional)", placeholder="https://domain.com/foto-produk.jpg")
     
     affiliate_link = st.text_input("Link Keranjang Kuning / Affiliate", placeholder="https://vt.tiktok.com/xxxx/")
     
@@ -27,16 +26,12 @@ with st.form("product_form"):
 if submit_button:
     if not product_name:
         st.error("Mohon isi Nama Produk!")
-    elif not uploaded_file and not image_url_input:
-        st.error("Mohon upload foto dari galeri ATAU isi Link URL Foto!")
+    elif not uploaded_file:
+        st.error("Mohon upload foto produk dari galeri HP Anda!")
     else:
-        image_base64 = ""
-        image_filename = ""
-        
-        if uploaded_file is not None:
-            bytes_data = uploaded_file.getvalue()
-            image_base64 = base64.b64encode(bytes_data).decode("utf-8")
-            image_filename = uploaded_file.name
+        bytes_data = uploaded_file.getvalue()
+        image_base64 = base64.b64encode(bytes_data).decode("utf-8")
+        image_filename = uploaded_file.name
             
         payload = {
             "Product Name": product_name,
@@ -58,3 +53,4 @@ if submit_button:
                     st.error(f"Gagal menghubungkan ke n8n. Status Code: {response.status_code}")
             except Exception as e:
                 st.error(f"Terjadi kesalahan koneksi: {str(e)}")
+    
