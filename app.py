@@ -43,7 +43,6 @@ if submit_button:
             "Category": category,
             "Selling Points": selling_points,
             "Price": price,
-            "Image URL": image_url_input if image_url_input else "",
             "Image Base64": image_base64,
             "Image Filename": image_filename,
             "Affiliate Link": affiliate_link
