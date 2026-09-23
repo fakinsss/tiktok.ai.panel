@@ -8,7 +8,8 @@ st.title("🚀 TikTok Affiliate AI Control Panel")
 st.write("Input detail produk & upload foto langsung dari galeri HP untuk memicu generasi video otomatis via n8n AI Engine.")
 
 # URL Webhook dari n8n Anda
-N8N_WEBHOOK_URL = "https://n8n-affiliate.onrender.com/webhook/generate-tiktok-video"
+N8N_WEBHOOK_URL = N8N_WEBHOOK_URL = "https://fakin5555.app.n8n.cloud/webhook/15725f95-bb5f-43b7-920d-32d5ef6cca58"
+
 
 with st.form("product_form"):
     product_name = st.text_input("Nama Produk", placeholder="Misal: Kemeja Oversize Streetwear")
